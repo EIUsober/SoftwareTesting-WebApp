@@ -43,23 +43,22 @@ public class MainControl extends HttpServlet {
             request.setAttribute("max", max);
             request.setAttribute("nom", nom);
             int[][] boundarySides = {{min, nom, nom}, {min++, nom, nom}, {nom, nom, nom}, {max--, nom, nom}, {max, nom, nom},
-            {nom, min, nom}, {nom, min++, nom}, {nom, nom, nom}, {nom, max--, nom}, {nom, max, nom}, {nom, nom, min}, {nom, nom, min++},
-            {nom, nom, nom}, {nom, nom, max--}, {nom, nom, max}};
+            {nom, min, nom}, {nom, min++, nom}, {nom, max--, nom}, {nom, max, nom}, {nom, nom, min}, {nom, nom, min++},
+            {nom, nom, max--}, {nom, nom, max}};
 
             int[][] robustSides = {{min--, nom, nom}, {min, nom, nom}, {min++, nom, nom}, {nom, nom, nom}, {max--, nom, nom}, {max, nom, nom}, {max++, nom, nom},
-            {nom, min--, nom}, {nom, min, nom}, {nom, min++, nom}, {nom, nom, nom}, {nom, max--, nom}, {nom, max, nom}, {nom, max++, nom}, {nom, nom, min--}, {nom, nom, min},
-            {nom, nom, min++}, {nom, nom, nom}, {nom, nom, max--}, {nom, nom, max}, {nom, nom, max++}};
+            {nom, min--, nom}, {nom, min, nom}, {nom, min++, nom},{nom, max--, nom}, {nom, max, nom}, {nom, max++, nom}, {nom, nom, min--}, {nom, nom, min},
+            {nom, nom, min++}, {nom, nom, max--}, {nom, nom, max}, {nom, nom, max++}};
 
             boolean boundaryChecked = false;
             boolean robustChecked = false;
-            boolean triangleChecked = false;
-            boolean commissionChecked = false;
+
 
             String[] boundary = {"classify", "classify2", "classify3", "classify4", "classify5", "classify6", "classify7",
-                "classify8", "classify9", "classify10", "classify11", "classify12", "classify13", "classify14", "classify15"};
+                "classify8", "classify9", "classify10", "classify11", "classify12", "classify13"};
             String[] robust = {"classify", "classify2", "classify3", "classify4", "classify5", "classify6", "classify7",
                 "classify8", "classify9", "classify10", "classify11", "classify12", "classify13", "classify14", "classify15", "classify16",
-                "classify17", "classify18", "classify19", "classify20", "classify21"};
+                "classify17", "classify18", "classify19"};
 
             if (checkboxes != null) {
                 for (String ck : checkboxes) {
@@ -69,62 +68,11 @@ public class MainControl extends HttpServlet {
                     if (ck.equals("robust")) {
                         robustChecked = true;
                     }
-                    if (ck.equals("triangle")) {
-                        triangleChecked = true;
-                    }
-                    if (ck.equals("commission")) {
-                        commissionChecked = true;
-                    }
                 }
-                if (robustChecked && boundaryChecked) {
-                    request.setAttribute("invalid1", "Invalid Choice");
+                if (robustChecked && boundaryChecked){
+                    request.setAttribute("error", "YOU CAN'T CHECK TWO OPTIONS!");
                 }
-                if (commissionChecked && triangleChecked) {
-                    request.setAttribute("invalid2", "Invalid Choice");
-                }
-                if (robustChecked && commissionChecked) {
-                    request.setAttribute("robustCommiss", "true");
-                    double Commission;
-                    for (int i = 0; i < robustSides.length; i++) {
-                        Commission commission = new Commission(robustSides[i][0], robustSides[i][1], robustSides[i][2], 30.0, 35.0, 40.0);
-                        double Sales = commission.calSale();
-
-                        if (Sales > 1800) {
-                            Commission = 0.10 * 1000.0;
-                            Commission = Commission + 0.15 * 800;
-                            Commission = Commission + 0.20 * (Sales - 1800.0);
-                        } else if (Sales > 1000) {
-                            Commission = 0.10 * 1000;
-                            Commission = Commission + 0.15 * (Sales - 1000);
-                        } else {
-                            Commission = 0.10 * Sales;
-                        }
-
-                        request.setAttribute(robust[i], Commission);
-                    }
-                }
-                if (boundaryChecked && commissionChecked) {
-                    request.setAttribute("boundaryCommiss", "true");
-                    double Commission;
-                    for (int i = 0; i < boundarySides.length; i++) {
-                        Commission commission = new Commission(boundarySides[i][0], boundarySides[i][1], boundarySides[i][2], 30.0, 35.0, 40.0);
-                        double Sales = commission.calSale();
-
-                        if (Sales > 1800) {
-                            Commission = 0.10 * 1000.0;
-                            Commission = Commission + 0.15 * 800;
-                            Commission = Commission + 0.20 * (Sales - 1800.0);
-                        } else if (Sales > 1000) {
-                            Commission = 0.10 * 1000;
-                            Commission = Commission + 0.15 * (Sales - 1000);
-                        } else {
-                            Commission = 0.10 * Sales;
-                        }
-
-                        request.setAttribute(boundary[i], Commission);
-                    }
-                }
-                if (boundaryChecked && triangleChecked) {
+                if (boundaryChecked) {
                     request.setAttribute("boundaryTriangle", "true");
                     for (int i = 0; i < boundarySides.length; i++) {
                         Triangle triangle = new Triangle();
@@ -140,7 +88,7 @@ public class MainControl extends HttpServlet {
                         request.setAttribute("alert", "It's not a triangle");
                     }
                 }
-                if (robustChecked && triangleChecked) {
+                if (robustChecked) {
                     request.setAttribute("robustTriangle", "true");
                     for (int i = 0; i < robustSides.length; i++) {
                         Triangle triangle = new Triangle();
@@ -164,7 +112,7 @@ public class MainControl extends HttpServlet {
             request.setAttribute("notFill", "You have to enter input");
         }
 
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("MainJSP.jsp");
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("TriangleJSP.jsp");
         requestDispatcher.forward(request, response);
 
     }
